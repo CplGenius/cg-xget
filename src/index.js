@@ -291,10 +291,16 @@ async function handleRequest(request, env, ctx) {
       return new Response('{}', { status: 200, headers });
     }
 
-    // Redirect root path or invalid platforms to GitHub repository
+    // Serve index.html for root path
     if (url.pathname === '/' || url.pathname === '') {
-      const HOME_PAGE_URL = 'https://github.com/xixu-me/Xget';
-      return Response.redirect(HOME_PAGE_URL, 302);
+      const htmlContent = await Deno.readTextFile('./public/index.html');
+      const headers = new Headers({
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
+      return new Response(htmlContent, { status: 200, headers });
     }
 
     const validation = validateRequest(request, url, config);
