@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xget URL 转换工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: #4facfe;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 1.1rem;
+        }
+        
+        .converter {
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ccc;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.2);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #convertBtn {
+            background-color: #4facfe;
+            background-image: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: #fff;
+            flex: 1;
+        }
+        
+        #convertBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+        }
+        
+        #copyBtn {
+            background-color: #6c757d;
+            color: #fff;
+        }
+        
+        #copyBtn:hover {
+            background-color: #5a6268;
+        }
+        
+        #clearBtn {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        
+        #clearBtn:hover {
+            background-color: #c82333;
+        }
+        
+        #result {
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 12px;
+            min-height: 100px;
+            font-size: 14px;
+            word-break: break-all;
+            color: #4facfe;
+        }
+        
+        .rules {
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            color: #4facfe;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+        
+        th {
+            background-color: #333;
+            font-weight: 600;
+            color: #ccc;
+        }
+        
+        td {
+            color: #fff;
+        }
+        
+        tr:hover {
+            background-color: #333;
+        }
+        
+        .platform {
+            font-weight: 600;
+            color: #4facfe;
+        }
+        
+        .url-format {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            color: #00f2fe;
+        }
+        
+        footer {
+            text-align: center;
+            color: #666;
+            padding: 20px 0;
+            border-top: 1px solid #333;
+        }
+        
+        .success {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Xget URL 转换工具</h1>
+            <p class="subtitle">将原始URL转换为Xget加速链接</p>
+        </header>
+        
+        <div class="converter">
+            <div class="success" id="copySuccess">已复制到剪贴板！</div>
+            
+            <div class="input-group">
+                <label for="sourceUrl">原始 URL</label>
+                <textarea id="sourceUrl" placeholder="请输入原始URL"></textarea>
+            </div>
+            
+            <div class="btn-group">
+                <button id="convertBtn">转换</button>
+                <button id="copyBtn">复制结果</button>
+                <button id="clearBtn">清空</button>
+            </div>
+            
+            <div class="input-group">
+                <label for="result">加速 URL</label>
+                <div id="result"></div>
+            </div>
+        </div>
+        
+        <div class="rules">
+            <h2>URL 转换规则</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>平台</th>
+                        <th>平台前缀</th>
+                        <th>原始 URL 格式</th>
+                        <th>加速 URL 格式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GitHub</td>
+                        <td class="platform">gh</td>
+                        <td class="url-format">https://github.com/...</td>
+                        <td class="url-format">https://域名/gh/...</td>
+                    </tr>
+                    <tr>
+                        <td>GitLab</td>
+                        <td class="platform">gl</td>
+                        <td class="url-format">https://gitlab.com/...</td>
+                        <td class="url-format">https://域名/gl/...</td>
+                    </tr>
+                    <tr>
+                        <td>Gitea</td>
+                        <td class="platform">gitea</td>
+                        <td class="url-format">https://gitea.com/...</td>
+                        <td class="url-format">https://域名/gitea/...</td>
+                    </tr>
+                    <tr>
+                        <td>Codeberg</td>
+                        <td class="platform">codeberg</td>
+                        <td class="url-format">https://codeberg.org/...</td>
+                        <td class="url-format">https://域名/codeberg/...</td>
+                    </tr>
+                    <tr>
+                        <td>SourceForge</td>
+                        <td class="platform">sf</td>
+                        <td class="url-format">https://sourceforge.net/...</td>
+                        <td class="url-format">https://域名/sf/...</td>
+                    </tr>
+                    <tr>
+                        <td>AOSP</td>
+                        <td class="platform">aosp</td>
+                        <td class="url-format">https://android.googlesource.com/...</td>
+                        <td class="url-format">https://域名/aosp/...</td>
+                    </tr>
+                    <tr>
+                        <td>Hugging Face</td>
+                        <td class="platform">hf</td>
+                        <td class="url-format">https://huggingface.co/...</td>
+                        <td class="url-format">https://域名/hf/...</td>
+                    </tr>
+                    <tr>
+                        <td>OpenAI</td>
+                        <td class="platform">ip/openai</td>
+                        <td class="url-format">https://api.openai.com/...</td>
+                        <td class="url-format">https://域名/ip/openai/...</td>
+                    </tr>
+                    <tr>
+                        <td>Anthropic</td>
+                        <td class="platform">ip/anthropic</td>
+                        <td class="url-format">https://api.anthropic.com/...</td>
+                        <td class="url-format">https://域名/ip/anthropic/...</td>
+                    </tr>
+                    <tr>
+                        <td>Gemini</td>
+                        <td class="platform">ip/gemini</td>
+                        <td class="url-format">https://generativelanguage.googleapis.com/...</td>
+                        <td class="url-format">https://域名/ip/gemini/...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <footer>
+            <p>Powered by Xget - Cloudflare Workers 文件下载加速</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 平台配置
+        const platforms = {
+            'https://github.com': 'gh',
+            'https://gitlab.com': 'gl',
+            'https://gitea.com': 'gitea',
+            'https://codeberg.org': 'codeberg',
+            'https://sourceforge.net': 'sf',
+            'https://android.googlesource.com': 'aosp',
+            'https://huggingface.co': 'hf',
+            'https://civitai.com': 'civitai',
+            'https://registry.npmjs.org': 'npm',
+            'https://pypi.org': 'pypi',
+            'https://files.pythonhosted.org': 'pypi-files',
+            'https://repo.anaconda.com': 'conda',
+            'https://conda.anaconda.org': 'conda-community',
+            'https://repo1.maven.org': 'maven',
+            'https://downloads.apache.org': 'apache',
+            'https://plugins.gradle.org': 'gradle',
+            'https://github.com/Homebrew': 'homebrew',
+            'https://formulae.brew.sh/api': 'homebrew-api',
+            'https://ghcr.io': 'homebrew-bottles',
+            'https://rubygems.org': 'rubygems',
+            'https://cran.r-project.org': 'cran',
+            'https://www.cpan.org': 'cpan',
+            'https://tug.ctan.org': 'ctan',
+            'https://proxy.golang.org': 'golang',
+            'https://api.nuget.org': 'nuget',
+            'https://crates.io': 'crates',
+            'https://repo.packagist.org': 'packagist',
+            'https://deb.debian.org': 'debian',
+            'https://archive.ubuntu.com': 'ubuntu',
+            'https://dl.fedoraproject.org': 'fedora',
+            'https://download.rockylinux.org': 'rocky',
+            'https://download.opensuse.org': 'opensuse',
+            'https://geo.mirror.pkgbuild.com': 'arch',
+            'https://arxiv.org': 'arxiv',
+            'https://f-droid.org': 'fdroid',
+            'https://updates.jenkins.io': 'jenkins',
+            // AI Inference Providers
+            'https://api.openai.com': 'ip-openai',
+            'https://api.anthropic.com': 'ip-anthropic',
+            'https://generativelanguage.googleapis.com': 'ip-gemini',
+            'https://aiplatform.googleapis.com': 'ip-vertexai',
+            'https://api.cohere.ai': 'ip-cohere',
+            'https://api.mistral.ai': 'ip-mistralai',
+            'https://api.x.ai': 'ip-xai',
+            'https://models.github.ai': 'ip-githubmodels',
+            'https://integrate.api.nvidia.com': 'ip-nvidiaapi',
+            'https://api.perplexity.ai': 'ip-perplexity',
+            'https://api.braintrust.dev': 'ip-braintrust',
+            'https://api.groq.com': 'ip-groq',
+            'https://api.cerebras.ai': 'ip-cerebras',
+            'https://api.sambanova.ai': 'ip-sambanova',
+            'https://router.huggingface.co': 'ip-huggingface',
+            'https://api.together.xyz': 'ip-together',
+            'https://api.replicate.com': 'ip-replicate',
+            'https://api.fireworks.ai': 'ip-fireworks',
+            'https://api.studio.nebius.ai': 'ip-nebius',
+            'https://api.jina.ai': 'ip-jina',
+            'https://api.voyageai.com': 'ip-voyageai',
+            'https://fal.run': 'ip-falai',
+            'https://api.novita.ai': 'ip-novita',
+            'https://ai.burncloud.com': 'ip-burncloud',
+            'https://openrouter.ai': 'ip-openrouter',
+            'https://api.poe.com': 'ip-poe',
+            'https://api.featherless.ai': 'ip-featherlessai',
+            'https://api.hyperbolic.xyz': 'ip-hyperbolic'
+        };
+        
+        // 获取当前域名
+        const currentDomain = window.location.origin;
+        
+        // URL转换函数
+        function convertUrl(url) {
+            try {
+                const parsedUrl = new URL(url);
+                const origin = parsedUrl.origin;
+                
+                if (platforms[origin]) {
+                    const platformKey = platforms[origin];
+                    const path = parsedUrl.pathname + parsedUrl.search;
+                    const prefix = platformKey.replace(/-/g, '/');
+                    return `${currentDomain}/${prefix}${path}`;
+                }
+                
+                return '不支持的平台';
+            } catch (error) {
+                return '无效的URL格式';
+            }
+        }
+        
+        // DOM元素
+        const sourceUrl = document.getElementById('sourceUrl');
+        const result = document.getElementById('result');
+        const convertBtn = document.getElementById('convertBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copySuccess = document.getElementById('copySuccess');
+        
+        // 转换按钮事件
+        convertBtn.addEventListener('click', () => {
+            const url = sourceUrl.value.trim();
+            if (url) {
+                const converted = convertUrl(url);
+                result.textContent = converted;
+            }
+        });
+        
+        // 复制按钮事件
+        copyBtn.addEventListener('click', () => {
+            const text = result.textContent;
+            if (text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    copySuccess.style.display = 'block';
+                    setTimeout(() => {
+                        copySuccess.style.display = 'none';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('复制失败:', err);
+                });
+            }
+        });
+        
+        // 清空按钮事件
+        clearBtn.addEventListener('click', () => {
+            sourceUrl.value = '';
+            result.textContent = '';
+        });
+        
+        // 回车转换
+        sourceUrl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                convertBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
